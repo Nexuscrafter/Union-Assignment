@@ -1,25 +1,21 @@
 class CustomSet {
     constructor(comparator) {
-        this.items = new Map(); // Using a Map for O(1) lookup
+        this.items = []; // Store unique elements
         this.comparator = comparator;
     }
 
     add(item) {
         if (!this.has(item)) {
-            this.items.set(this._getKey(item), item);
+            this.items.push(item);
         }
     }
 
     has(item) {
-        return this.items.has(this._getKey(item));
+        return this.items.some(existingItem => this.comparator(existingItem, item));
     }
 
     values() {
-        return Array.from(this.items.values());
-    }
-
-    _getKey(item) {
-        return JSON.stringify(item); // Generates a unique key for deep objects/arrays
+        return this.items;
     }
 }
 
@@ -27,10 +23,7 @@ class CustomSet {
 const deepEqual = (obj1, obj2) => {
     if (obj1 === obj2) return true; // Reference equality check
 
-    if (typeof obj1 !== 'object' || obj1 === null ||
-        typeof obj2 !== 'object' || obj2 === null || 
-        typeof obj1 !== 'Array' || typeof obj2 !== 'Array') {
-        
+    if (typeof obj1 !== 'object' || obj1 === null || typeof obj2 !== 'object' || obj2 === null) {
         return false; // One is null or not an object
     }
 
@@ -41,7 +34,6 @@ const deepEqual = (obj1, obj2) => {
 
     const keys1 = Object.keys(obj1);
     const keys2 = Object.keys(obj2);
-
     if (keys1.length !== keys2.length) return false; // Different number of keys
 
     return keys1.every(key => keys2.includes(key) && deepEqual(obj1[key], obj2[key]));
